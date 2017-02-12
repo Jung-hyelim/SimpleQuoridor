@@ -5,7 +5,8 @@
 </head>
 <body>
 <h1>
-    ${projectName}의 세계에 오신것을 환영합니다!
+    ${projectName}의 세계에 오신것을 환영합니다! <br>
+    By ${projectMember}
 </h1>
 </body>
 </html>
