@@ -12,6 +12,7 @@ public class IndexController {
     public ModelAndView index() {
         ModelAndView mav = new ModelAndView("/index");
         mav.addObject("projectName", "쿼리도");
+        mav.addObject("projectMember", "정혜림 & 이상필");
 
         return mav;
     }
