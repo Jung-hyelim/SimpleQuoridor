@@ -15,4 +15,13 @@ public class IndexController {
         return mav;
     }
 
+
+    @RequestMapping(value = "/start", method = RequestMethod.GET)
+    public ModelAndView gameStart() {
+        ModelAndView mav = new ModelAndView("/game");
+
+        return mav;
+    }
+
+
 }
