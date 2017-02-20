@@ -27,7 +27,7 @@ public class SwaggerConfig {
 	private ApiInfo apiInfo() {
 	    ApiInfo apiInfo = new ApiInfo(
 	      "REST API",
-	      "Some custom description of API.",
+	      "Simple Quoridor API",
 	      "API V1.0",
 	      "Terms of service",
 	      "jhl3646@naver.com",
