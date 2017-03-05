@@ -32,12 +32,26 @@ public class SwaggerConfig {
 
         List<Parameter> globalParameters = Lists.newArrayList();
         globalParameters.add(new ParameterBuilder()
+        		.name("gameName")
+        		.description("API game name info")
+        		.modelRef(new ModelRef("string"))
+        		.parameterType("path")
+        		.required(true)
+        		.build());
+        globalParameters.add(new ParameterBuilder()
                 .name("version")
                 .description("API version info")
                 .modelRef(new ModelRef("string"))
                 .parameterType("path")
                 .required(true)
                 .build());
+        globalParameters.add(new ParameterBuilder()
+		        .name("player")
+		        .description("API player info")
+		        .modelRef(new ModelRef("string"))
+		        .parameterType("path")
+		        .required(true)
+		        .build());
 
         // TODO : hyelim-jung : global response content type 설정하기.
 
@@ -62,6 +76,6 @@ public class SwaggerConfig {
                 "jhl3646@naver.com",
                 "License of API",
                 "API license URL");
-        return apiInfo;
-    }
+		return apiInfo;
+	}
 }
