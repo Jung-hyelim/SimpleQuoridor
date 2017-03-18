@@ -1,10 +1,12 @@
 package com.simple.quoridor.utils;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -17,7 +19,8 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import java.util.List;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 @Configuration
 @EnableSwagger2
@@ -33,29 +36,32 @@ public class SwaggerConfig {
         List<Parameter> globalParameters = Lists.newArrayList();
         globalParameters.add(new ParameterBuilder()
         		.name("gameName")
-        		.description("API game name info")
+        		.description("API game name info\n ex) SimpleQuoridor")
         		.modelRef(new ModelRef("string"))
         		.parameterType("path")
         		.required(true)
         		.build());
         globalParameters.add(new ParameterBuilder()
                 .name("version")
-                .description("API version info")
+                .description("API version info\n ex) v1, v2")
                 .modelRef(new ModelRef("string"))
                 .parameterType("path")
                 .required(true)
                 .build());
         globalParameters.add(new ParameterBuilder()
-		        .name("player")
-		        .description("API player info")
+		        .name("userId")
+		        .description("API player info\n ex) p1, p2")
 		        .modelRef(new ModelRef("string"))
 		        .parameterType("path")
 		        .required(true)
 		        .build());
 
-        // TODO : hyelim-jung : global response content type 설정하기.
+        // global response content type 설정
+        Set<String> defaultProduces = Sets.newHashSet();
+        defaultProduces.add("application/json");
 
         return new Docket(DocumentationType.SWAGGER_2)
+        		.produces(defaultProduces)
                 .globalOperationParameters(globalParameters)
                 .globalResponseMessage(RequestMethod.GET, globalResponseMessages)
                 .select()
