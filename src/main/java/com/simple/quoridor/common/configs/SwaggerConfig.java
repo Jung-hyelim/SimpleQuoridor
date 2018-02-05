@@ -1,4 +1,4 @@
-package com.simple.quoridor.utils;
+package com.simple.quoridor.common.configs;
 
 import java.util.List;
 import java.util.Set;
@@ -36,25 +36,18 @@ public class SwaggerConfig {
         List<Parameter> globalParameters = Lists.newArrayList();
         globalParameters.add(new ParameterBuilder()
         		.name("gameName")
-        		.description("API game name info\n ex) SimpleQuoridor")
+        		.description("API game name info <br /> ex) SimpleQuoridor")
         		.modelRef(new ModelRef("string"))
         		.parameterType("path")
         		.required(true)
         		.build());
         globalParameters.add(new ParameterBuilder()
                 .name("version")
-                .description("API version info\n ex) v1, v2")
+                .description("API version info <br /> ex) v1, v2")
                 .modelRef(new ModelRef("string"))
                 .parameterType("path")
                 .required(true)
                 .build());
-        globalParameters.add(new ParameterBuilder()
-		        .name("userId")
-		        .description("API player info\n ex) p1, p2")
-		        .modelRef(new ModelRef("string"))
-		        .parameterType("path")
-		        .required(true)
-		        .build());
 
         // global response content type 설정
         Set<String> defaultProduces = Sets.newHashSet();
@@ -64,6 +57,7 @@ public class SwaggerConfig {
         		.produces(defaultProduces)
                 .globalOperationParameters(globalParameters)
                 .globalResponseMessage(RequestMethod.GET, globalResponseMessages)
+                .globalResponseMessage(RequestMethod.POST, globalResponseMessages)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.simple.quoridor.controller"))
                 .paths(PathSelectors.any())

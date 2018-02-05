@@ -1,4 +1,4 @@
-package com.simple.quoridor.utils;
+package com.simple.quoridor.common.utils;
 
 /**
  * Created by leesangpil on 2017. 2. 14..
