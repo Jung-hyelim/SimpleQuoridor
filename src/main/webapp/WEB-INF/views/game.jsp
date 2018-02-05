@@ -107,7 +107,8 @@
                 }
 
                 // confirm 확인
-                if (confirm("정말 이동하시겠습니까?")) {
+                //if (confirm("정말 이동하시겠습니까?")) {
+                if (true) {
                     // 이동
                     move();
 
@@ -118,8 +119,10 @@
         }
 
         // TODO : 2차원 배열 좌표로 1차원 배열 좌표를 반환하는 함수가 필요 (validatePosition 함수 내에서 사용)
-        function getArrayIndex(x, y) {
-            return null;
+        function getArrayIndex(realX, realY) {
+            var x = parseInt(realX);
+            var y = parseInt(realY);
+            return (x - 1)*17 + y;
         }
 
         // 이동할 수 있는 위치인지 판단한다.
@@ -127,6 +130,7 @@
             loggingPosition(realX, realY);
 
             var arrayIndex = getArrayIndex(realX, realY);
+            console.log("1차원 배열값 :" + arrayIndex);
 
             // TODO : 내위치 에서 한번에 이동할 수 있는 거리인지 판단
 
