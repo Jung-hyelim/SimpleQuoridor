@@ -39,6 +39,10 @@
     	// 2 : 2p
     	var currentPlayer = 1;
     	
+    	// 플레이어 현재 위치 인덱스
+    	var indexPlayer1 = 8;
+    	var indexPlayer2 = 280;
+    	
     	// 맵을 초기화 한다.
         // TODO : data-status 정의 필요
         // 0 : 아무것도 못하는 위치 (default)
@@ -123,7 +127,7 @@
                     drawingMap();
                     
                     // 플레이어 턴 변경
-                    currentPlayer = (currentPlayer % 2 == 0 ? 1 : 2);
+                    currentPlayer = (currentPlayer == 2 ? 1 : 2);
                 }
             });
         }
@@ -142,6 +146,13 @@
             var arrayIndex = getArrayIndex(realX, realY);
             console.log("1차원 배열값 :" + arrayIndex);
 
+            var $maps = $('.map');
+            
+            // 비어있는지 판단
+            if($maps[arrayIndex].getAttribute("data-status") != "3"){
+            	return false;
+            }
+
             // TODO : 내위치 에서 한번에 이동할 수 있는 거리인지 판단
 
             // TODO : 현재 맵에 장애물 위치 판단
@@ -155,17 +166,19 @@
         function move(realX, realY) {
             // TODO : data-status 값 변환
             var $maps = $('.map');
+        	var arrayIndex = getArrayIndex(realX, realY);
             
-            // 현재 플레이어의 현재위치 data-status 값 변환
-            for(var i = 0; i < 289; i++){
-            	if($maps[i].getAttribute('data-status') == currentPlayer){
-            		$maps[i].setAttribute("data-status", "3");
-            		break;
-            	}
+            // 현재 플레이어의 현재위치 data-status 값 변환 & 플레이어 현재 위치 인덱스 값 변환
+            if (currentPlayer == 1) {
+                $maps[indexPlayer1].setAttribute("data-status", "3");
+                indexPlayer1 = arrayIndex;
+            } else {
+            	$maps[indexPlayer2].setAttribute("data-status", "3");
+            	indexPlayer2 = arrayIndex;
             }
             
             // 현재 플레이어의 이동위치 data-status 값 변환
-        	$maps[getArrayIndex(realX, realY)].setAttribute("data-status", currentPlayer);
+        	$maps[arrayIndex].setAttribute("data-status", currentPlayer);
         }
 
         // status값을 보고 맵 색상을 변환한다
