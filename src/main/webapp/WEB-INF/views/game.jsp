@@ -34,7 +34,12 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script type="text/javascript">
     (function ($, window, document) {
-        // 맵을 초기화 한다.
+    	// 현재 플레이어
+    	// 1 : 1p
+    	// 2 : 2p
+    	var currentPlayer = 1;
+    	
+    	// 맵을 초기화 한다.
         // TODO : data-status 정의 필요
         // 0 : 아무것도 못하는 위치 (default)
         // 1 : 1p 위치
@@ -80,6 +85,8 @@
             $maps[280].setAttribute("data-status", "2");
 
             drawingMap();
+            
+            currentPlayer = 1;
         }
 
         // 좌표를 로깅한다
@@ -110,10 +117,13 @@
                 //if (confirm("정말 이동하시겠습니까?")) {
                 if (true) {
                     // 이동
-                    move();
+                    move(realX, realY);
 
                     // re-render
                     drawingMap();
+                    
+                    // 플레이어 턴 변경
+                    currentPlayer = (currentPlayer % 2 == 0 ? 1 : 2);
                 }
             });
         }
@@ -122,7 +132,7 @@
         function getArrayIndex(realX, realY) {
             var x = parseInt(realX);
             var y = parseInt(realY);
-            return (x - 1)*17 + y;
+            return (x - 1)*17 + y - 1;
         }
 
         // 이동할 수 있는 위치인지 판단한다.
@@ -142,8 +152,20 @@
         }
 
         // 실제 이동한다.
-        function move() {
+        function move(realX, realY) {
             // TODO : data-status 값 변환
+            var $maps = $('.map');
+            
+            // 현재 플레이어의 현재위치 data-status 값 변환
+            for(var i = 0; i < 289; i++){
+            	if($maps[i].getAttribute('data-status') == currentPlayer){
+            		$maps[i].setAttribute("data-status", "3");
+            		break;
+            	}
+            }
+            
+            // 현재 플레이어의 이동위치 data-status 값 변환
+        	$maps[getArrayIndex(realX, realY)].setAttribute("data-status", currentPlayer);
         }
 
         // status값을 보고 맵 색상을 변환한다
