@@ -33,6 +33,8 @@
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script type="text/javascript">
+    // TODO : 아래 HTML 색상표 참조
+    // https://www.w3schools.com/tags/ref_colornames.asp
     (function ($, window, document) {
     	// 현재 플레이어
     	// 1 : 1p
@@ -132,7 +134,31 @@
             });
         }
 
-        // TODO : 2차원 배열 좌표로 1차원 배열 좌표를 반환하는 함수가 필요 (validatePosition 함수 내에서 사용)
+        // 맵에 마우스오버했을때 발생하는 이벤트
+        function mouseoverMap() {
+            var $maps = $('.map');
+            $maps.on("mouseover", function() {
+                // re-render
+                drawingMap();
+
+                // 실제 테이블의 좌표 x,y
+                var realX = this.getAttribute('data-row');
+                var realY = this.getAttribute('data-col');
+
+                var arrayIndex = getArrayIndex(realX, realY);
+
+                // validate Position
+                if (validatePosition(realX, realY) == false) {
+                    console.log("false");
+                    $maps[arrayIndex].style.backgroundColor = "Crimson";
+                    return;
+                }
+                console.log("true");
+                $maps[arrayIndex].style.backgroundColor = "Chartreuse";
+            });
+        }
+
+        // 2차원 배열 좌표로 1차원 배열 좌표를 반환하는 함수
         function getArrayIndex(realX, realY) {
             var x = parseInt(realX);
             var y = parseInt(realY);
@@ -141,7 +167,7 @@
 
         // 이동할 수 있는 위치인지 판단한다.
         function validatePosition(realX, realY) {
-            loggingPosition(realX, realY);
+            //loggingPosition(realX, realY);
 
             var arrayIndex = getArrayIndex(realX, realY);
             console.log("1차원 배열값 :" + arrayIndex);
@@ -216,6 +242,9 @@
 
             // click event binding
             clickMap();
+
+            // mouseover event binding
+            mouseoverMap();
 
         });
     })(jQuery, window, document);
