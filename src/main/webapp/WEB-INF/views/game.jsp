@@ -20,7 +20,7 @@
         text-align: center;
     }
 </style>
-
+<h2><span id="showCurrentPlayer">1</span>P</h2>
 <table class="maps" align="center">
     <c:forEach var="i" begin="1" end="17">
         <tr>
@@ -122,12 +122,12 @@
                 if (true) {
                     // 이동
                     move(realX, realY);
-
-                    // re-render
-                    drawingMap();
                     
                     // 플레이어 턴 변경
                     currentPlayer = (currentPlayer == 2 ? 1 : 2);
+
+                    // re-render
+                    drawingMap();
                 }
             });
         }
@@ -154,6 +154,12 @@
             }
 
             // TODO : 내위치 에서 한번에 이동할 수 있는 거리인지 판단
+            var beforeX = (currentPlayer == 1 ? $maps[indexPlayer1].getAttribute("data-row") : $maps[indexPlayer2].getAttribute("data-row"));
+            var beforeY = (currentPlayer == 1 ? $maps[indexPlayer1].getAttribute("data-col") : $maps[indexPlayer2].getAttribute("data-col"));
+            var checkLength = Math.abs(realX - beforeX) + Math.abs(realY - beforeY);
+            if(checkLength >= 4 || checkLength <= 0){
+            	return false;
+            }
 
             // TODO : 현재 맵에 장애물 위치 판단
 
@@ -199,6 +205,8 @@
                     $maps[i].style.backgroundColor = "white";
                 }
             }
+            
+            $('#showCurrentPlayer').html(currentPlayer);
         }
 
         // Main function
