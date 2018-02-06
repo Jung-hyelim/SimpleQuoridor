@@ -42,8 +42,12 @@
     	var currentPlayer = 1;
     	
     	// 플레이어 현재 위치 인덱스
-    	var indexPlayer1 = 8;
-    	var indexPlayer2 = 280;
+    	//var indexPlayer1 = 8;
+    	//var indexPlayer2 = 280;
+    	var indexPlayer = [8,280];
+    	
+    	// 플레이어 장애물 개수
+    	var cntWall = [10,10];
     	
     	// 맵을 초기화 한다.
         // TODO : data-status 정의 필요
@@ -171,23 +175,53 @@
 
             var arrayIndex = getArrayIndex(realX, realY);
             console.log("1차원 배열값 :" + arrayIndex);
+            
+            realX = parseInt(realX);
+            realY = parseInt(realY);
 
             var $maps = $('.map');
             
-            // 비어있는지 판단
-            if($maps[arrayIndex].getAttribute("data-status") != "3"){
+            // 이동위치가 비어있는지 판단
+            if ($maps[arrayIndex].getAttribute("data-status") == "3") {
+	            // TODO : 내위치 에서 한번에 이동할 수 있는 거리인지 판단
+	            //var beforeX = (currentPlayer == 1 ? $maps[indexPlayer1].getAttribute("data-row") : $maps[indexPlayer2].getAttribute("data-row"));
+	            //var beforeY = (currentPlayer == 1 ? $maps[indexPlayer1].getAttribute("data-col") : $maps[indexPlayer2].getAttribute("data-col"));
+	            var beforeX = $maps[indexPlayer[currentPlayer-1]].getAttribute("data-row");
+	            var beforeY = $maps[indexPlayer[currentPlayer-1]].getAttribute("data-col");
+	            var checkLength = Math.abs(realX - beforeX) + Math.abs(realY - beforeY);
+	            if (checkLength >= 4 || checkLength <= 0) {
+	            	return false;
+	            }
+	        
+	        // TODO : 현재 맵에 장애물 위치 판단
+            } else if ($maps[arrayIndex].getAttribute("data-status") == "4") {
+                // 현재 플레이어의 남은 장애물 개수 판단
+                if (cntWall[currentPlayer-1] <= 0 ) {
+                	return false;
+                }
+            	
+                // TODO : 연속된 위치에 장애물 설치할 수 있는지 판단
+                if (realX % 2 == 0) {
+                	// 오른쪽에 장애물 위치인지 판단
+                	if ((realY + 2) > 17) {
+                		return false;
+                	}
+                	if ($maps[arrayIndex + 2].getAttribute("data-status") != "4") {
+                		return false;
+                	}
+                } else {
+                	// 아래쪽에 장애물 위치인지 판단
+                	if ((arrayIndex + 17*2) > 289) {
+                		return false;
+                	}
+                	if ($maps[arrayIndex + 17*2].getAttribute("data-status") != "4") {
+                		return false;
+                	}
+                }
+                
+            } else {
             	return false;
             }
-
-            // TODO : 내위치 에서 한번에 이동할 수 있는 거리인지 판단
-            var beforeX = (currentPlayer == 1 ? $maps[indexPlayer1].getAttribute("data-row") : $maps[indexPlayer2].getAttribute("data-row"));
-            var beforeY = (currentPlayer == 1 ? $maps[indexPlayer1].getAttribute("data-col") : $maps[indexPlayer2].getAttribute("data-col"));
-            var checkLength = Math.abs(realX - beforeX) + Math.abs(realY - beforeY);
-            if(checkLength >= 4 || checkLength <= 0){
-            	return false;
-            }
-
-            // TODO : 현재 맵에 장애물 위치 판단
 
             // TODO : 현재 맵에 상대방 위치 판단
 
@@ -201,13 +235,15 @@
         	var arrayIndex = getArrayIndex(realX, realY);
             
             // 현재 플레이어의 현재위치 data-status 값 변환 & 플레이어 현재 위치 인덱스 값 변환
-            if (currentPlayer == 1) {
+            /* if (currentPlayer == 1) {
                 $maps[indexPlayer1].setAttribute("data-status", "3");
                 indexPlayer1 = arrayIndex;
             } else {
             	$maps[indexPlayer2].setAttribute("data-status", "3");
             	indexPlayer2 = arrayIndex;
-            }
+            } */
+            $maps[indexPlayer[currentPlayer-1]].setAttribute("data-status", "3");
+            indexPlayer[currentPlayer-1] = arrayIndex;
             
             // 현재 플레이어의 이동위치 data-status 값 변환
         	$maps[arrayIndex].setAttribute("data-status", currentPlayer);
