@@ -1,0 +1,25 @@
+table {
+    float: left;
+    /*margin: 1em;*/
+}
+/*전체 맵에 대한 css*/
+.maps {
+    background-color: #d9d9d9;
+    width: 700px;
+    height: 700px;
+    border: 1px solid black;
+    margin-top: 50px;
+}
+/*개별 맵에 대한 css*/
+.map {
+    background-color: brown;
+    text-align: center;
+}
+/*전체 장애물에 대한 css*/
+.walls {
+    background-color: #d9d9d9;
+    width: 143px;
+    height: 700px;
+    border: 1px solid black;
+    margin-top: 50px;
+}

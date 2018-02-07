@@ -3,25 +3,18 @@
 <html>
 <head>
     <title>Simple Quoridor</title>
+    <link href="<c:url value="/static/css/game.css"/>" rel="stylesheet">
 </head>
 <body>
-<style>
-    /*전체 맵에 대한 css*/
-    .maps {
-        background-color: #d9d9d9;
-        width: 700px;
-        height: 700px;
-        border: 1px solid black;
-        margin-top: 50px;
-    }
-    /*개별 맵에 대한 css*/
-    .map {
-        background-color: brown;
-        text-align: center;
-    }
-</style>
 <h2><span id="showCurrentPlayer">1</span>P</h2>
-<table class="maps" align="center">
+<table class="walls player1_walls">
+    <c:forEach var="i" begin="1" end="21">
+        <tr>
+            <td class="player1_wall" data-row="${i}" data-status="0"></td>
+        </tr>
+    </c:forEach>
+</table>
+<table class="maps">
     <c:forEach var="i" begin="1" end="17">
         <tr>
             <c:forEach var="j" begin="1" end="17">
@@ -30,259 +23,18 @@
         </tr>
     </c:forEach>
 </table>
+<table class="walls player2_walls">
+    <c:forEach var="i" begin="1" end="21">
+        <tr>
+            <td class="player2_wall" data-row="${i}" data-status="0"></td>
+        </tr>
+    </c:forEach>
+</table>
 </body>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script type="text/javascript">
-    // TODO : 아래 HTML 색상표 참조
-    // https://www.w3schools.com/tags/ref_colornames.asp
-    (function ($, window, document) {
-    	// 현재 플레이어
-    	// 1 : 1p
-    	// 2 : 2p
-    	var currentPlayer = 1;
-    	
-    	// 플레이어 현재 위치 인덱스
-    	//var indexPlayer1 = 8;
-    	//var indexPlayer2 = 280;
-    	var indexPlayer = [8,280];
-    	
-    	// 플레이어 장애물 개수
-    	var cntWall = [10,10];
-    	
-    	// 맵을 초기화 한다.
-        // TODO : data-status 정의 필요
-        // 0 : 아무것도 못하는 위치 (default)
-        // 1 : 1p 위치
-        // 2 : 2p 위치
-        // 3 : 사람이 이동할 수 있는 위치
-        // 4 : 장애물이 놓아질 수 있는 위치
-        // 5 : 장애물이 놓아진 위치
-        function initMap() {
-            var $maps = $('.map');
-            for (var i = 0; i < 289; i++) {
-                if ($maps[i].getAttribute('data-row') % 2 == 0) {
-                    // 짝수 행일 때
-                    if ($maps[i].getAttribute('data-col') % 2 == 0) {
-                        // 짝수 열이면
-                        $maps[i].setAttribute("data-status", "3");
-                    } else {
-                        // 홀수 열이면
-                        $maps[i].height = '10px';
-                        $maps[i].setAttribute("data-status", "4");
-                    }
-                } else {
-                    // 홀수 행일 때
-                    if ($maps[i].getAttribute('data-col') % 2 == 0) {
-                        // 짝수 열이면
-                        $maps[i].width = '5px';
-                        $maps[i].setAttribute("data-status", "4");
-                    } else {
-                        // 홀수 열이면
-                        $maps[i].width = '40px';
-                        $maps[i].setAttribute("data-status", "3");
-                    }
-                }
-
-                // 아무것도 못하는 위치 설정
-                if ($maps[i].getAttribute('data-row') % 2 == 0 &&
-                    $maps[i].getAttribute('data-col') % 2 == 0) {
-                    $maps[i].setAttribute("data-status", "0");
-                }
-            }
-            // 1p 초기위치
-            $maps[8].setAttribute("data-status", "1");
-            // 2p 초기위치
-            $maps[280].setAttribute("data-status", "2");
-
-            drawingMap();
-            
-            currentPlayer = 1;
-        }
-
-        // 좌표를 로깅한다
-        function loggingPosition(realX, realY) {
-            // 게임상의 좌표 x,y
-            var x = parseInt(realX / 2 + 1);
-            var y = parseInt(realY / 2 + 1);
-
-            console.log("x : " + x + ", y : " + y);
-            console.log("실제 x : " + realX + ", y : " + realY);
-        }
-
-        // 맵을 클릭했을때 발생하는 이벤트
-        function clickMap() {
-            var $maps = $('.map');
-            $maps.on("click", function() {
-                // 실제 테이블의 좌표 x,y
-                var realX = this.getAttribute('data-row');
-                var realY = this.getAttribute('data-col');
-
-                // validate Position
-                if (validatePosition(realX, realY) == false) {
-                    alert("해당 위치로는 이동할 수 없습니다.");
-                    return;
-                }
-
-                // confirm 확인
-                //if (confirm("정말 이동하시겠습니까?")) {
-                if (true) {
-                    // 이동
-                    move(realX, realY);
-                    
-                    // 플레이어 턴 변경
-                    currentPlayer = (currentPlayer == 2 ? 1 : 2);
-
-                    // re-render
-                    drawingMap();
-                }
-            });
-        }
-
-        // 맵에 마우스오버했을때 발생하는 이벤트
-        function mouseoverMap() {
-            var $maps = $('.map');
-            $maps.on("mouseover", function() {
-                // re-render
-                drawingMap();
-
-                // 실제 테이블의 좌표 x,y
-                var realX = this.getAttribute('data-row');
-                var realY = this.getAttribute('data-col');
-
-                var arrayIndex = getArrayIndex(realX, realY);
-
-                // validate Position
-                if (validatePosition(realX, realY) == false) {
-                    console.log("false");
-                    $maps[arrayIndex].style.backgroundColor = "Crimson";
-                    return;
-                }
-                console.log("true");
-                $maps[arrayIndex].style.backgroundColor = "Chartreuse";
-            });
-        }
-
-        // 2차원 배열 좌표로 1차원 배열 좌표를 반환하는 함수
-        function getArrayIndex(realX, realY) {
-            var x = parseInt(realX);
-            var y = parseInt(realY);
-            return (x - 1)*17 + y - 1;
-        }
-
-        // 이동할 수 있는 위치인지 판단한다.
-        function validatePosition(realX, realY) {
-            //loggingPosition(realX, realY);
-
-            var arrayIndex = getArrayIndex(realX, realY);
-            console.log("1차원 배열값 :" + arrayIndex);
-            
-            realX = parseInt(realX);
-            realY = parseInt(realY);
-
-            var $maps = $('.map');
-            
-            // 이동위치가 비어있는지 판단
-            if ($maps[arrayIndex].getAttribute("data-status") == "3") {
-	            // TODO : 내위치 에서 한번에 이동할 수 있는 거리인지 판단
-	            //var beforeX = (currentPlayer == 1 ? $maps[indexPlayer1].getAttribute("data-row") : $maps[indexPlayer2].getAttribute("data-row"));
-	            //var beforeY = (currentPlayer == 1 ? $maps[indexPlayer1].getAttribute("data-col") : $maps[indexPlayer2].getAttribute("data-col"));
-	            var beforeX = $maps[indexPlayer[currentPlayer-1]].getAttribute("data-row");
-	            var beforeY = $maps[indexPlayer[currentPlayer-1]].getAttribute("data-col");
-	            var checkLength = Math.abs(realX - beforeX) + Math.abs(realY - beforeY);
-	            if (checkLength >= 4 || checkLength <= 0) {
-	            	return false;
-	            }
-	        
-	        // TODO : 현재 맵에 장애물 위치 판단
-            } else if ($maps[arrayIndex].getAttribute("data-status") == "4") {
-                // 현재 플레이어의 남은 장애물 개수 판단
-                if (cntWall[currentPlayer-1] <= 0 ) {
-                	return false;
-                }
-            	
-                // TODO : 연속된 위치에 장애물 설치할 수 있는지 판단
-                if (realX % 2 == 0) {
-                	// 오른쪽에 장애물 위치인지 판단
-                	if ((realY + 2) > 17) {
-                		return false;
-                	}
-                	if ($maps[arrayIndex + 2].getAttribute("data-status") != "4") {
-                		return false;
-                	}
-                } else {
-                	// 아래쪽에 장애물 위치인지 판단
-                	if ((arrayIndex + 17*2) > 289) {
-                		return false;
-                	}
-                	if ($maps[arrayIndex + 17*2].getAttribute("data-status") != "4") {
-                		return false;
-                	}
-                }
-                
-            } else {
-            	return false;
-            }
-
-            // TODO : 현재 맵에 상대방 위치 판단
-
-            return true;
-        }
-
-        // 실제 이동한다.
-        function move(realX, realY) {
-            // TODO : data-status 값 변환
-            var $maps = $('.map');
-        	var arrayIndex = getArrayIndex(realX, realY);
-            
-            // 현재 플레이어의 현재위치 data-status 값 변환 & 플레이어 현재 위치 인덱스 값 변환
-            /* if (currentPlayer == 1) {
-                $maps[indexPlayer1].setAttribute("data-status", "3");
-                indexPlayer1 = arrayIndex;
-            } else {
-            	$maps[indexPlayer2].setAttribute("data-status", "3");
-            	indexPlayer2 = arrayIndex;
-            } */
-            $maps[indexPlayer[currentPlayer-1]].setAttribute("data-status", "3");
-            indexPlayer[currentPlayer-1] = arrayIndex;
-            
-            // 현재 플레이어의 이동위치 data-status 값 변환
-        	$maps[arrayIndex].setAttribute("data-status", currentPlayer);
-        }
-
-        // status값을 보고 맵 색상을 변환한다
-        function drawingMap() {
-            var $maps = $('.map');
-            for (var i = 0; i < 289; i++) {
-                if ($maps[i].getAttribute('data-status') == "1") {
-                    $maps[i].style.backgroundColor = "red";
-                } else if ($maps[i].getAttribute('data-status') == "2") {
-                    $maps[i].style.backgroundColor = "blue";
-                } else if ($maps[i].getAttribute('data-status') == "3") {
-                    $maps[i].style.backgroundColor = "brown";
-                } else if ($maps[i].getAttribute('data-status') == "4") {
-                    $maps[i].style.backgroundColor = "black";
-                } else if ($maps[i].getAttribute('data-status') == "5") {
-                    $maps[i].style.backgroundColor = "yellow";
-                } else {
-                    $maps[i].style.backgroundColor = "white";
-                }
-            }
-            
-            $('#showCurrentPlayer').html(currentPlayer);
-        }
-
-        // Main function
-        $(document).ready(function () {
-            // init map info
-            initMap();
-
-            // click event binding
-            clickMap();
-
-            // mouseover event binding
-            mouseoverMap();
-
-        });
-    })(jQuery, window, document);
-</script>
+<script src="<c:url value="/static/lib/jquery.min.js"/>"></script>
+<script src="<c:url value="/static/js/common.js"/>"></script>
+<script src="<c:url value="/static/js/util.js"/>"></script>
+<script src="<c:url value="/static/js/game.js"/>"></script>
+<script src="<c:url value="/static/js/map.js"/>"></script>
+<script src="<c:url value="/static/js/wall.js"/>"></script>
 </html>
