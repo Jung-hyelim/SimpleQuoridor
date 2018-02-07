@@ -27,18 +27,25 @@
     game.util.drawingMap = function() {
         var $maps = $('.map');
         for (var i = 0; i < 289; i++) {
-            if ($maps[i].getAttribute('data-status') == "1") {
-                $maps[i].style.backgroundColor = game.color.RED;
-            } else if ($maps[i].getAttribute('data-status') == "2") {
-                $maps[i].style.backgroundColor = game.color.BLUE;
-            } else if ($maps[i].getAttribute('data-status') == "3") {
-                $maps[i].style.backgroundColor = game.color.BROWN;
-            } else if ($maps[i].getAttribute('data-status') == "4") {
-                $maps[i].style.backgroundColor = game.color.BLACK;
-            } else if ($maps[i].getAttribute('data-status') == "5") {
-                $maps[i].style.backgroundColor = game.color.YELLOW;
-            } else {
-                $maps[i].style.backgroundColor = game.color.WHITE;
+            switch ($maps[i].getAttribute('data-status')) {
+                case game.mapStatus.PLAYER1:
+                    $maps[i].style.backgroundColor = game.color.RED;
+                    continue;
+                case game.mapStatus.PLAYER2:
+                    $maps[i].style.backgroundColor = game.color.BLUE;
+                    continue;
+                case game.mapStatus.ABLE_PLAYER:
+                    $maps[i].style.backgroundColor = game.color.BROWN;
+                    continue;
+                case game.mapStatus.ABLE_WALL:
+                    $maps[i].style.backgroundColor = game.color.BLACK;
+                    continue;
+                case game.mapStatus.WALL:
+                    $maps[i].style.backgroundColor = game.color.YELLOW;
+                    continue;
+                default :
+                    $maps[i].style.backgroundColor = game.color.WHITE;
+                    continue;
             }
         }
         game.util.drawingPlayerTurn();
