@@ -18,6 +18,18 @@
         return (x - 1)*17 + y - 1;
     };
 
+    // 1차원 배열 좌표로 2차원 배열 X좌표를 반환하는 함수
+    game.util.getRealX = function(arrayIndex) {
+        var index = parseInt(arrayIndex);
+        return Math.floor(index / 17) + 1;
+    };
+
+    // 1차원 배열 좌표로 2차원 배열 Y좌표를 반환하는 함수
+    game.util.getRealY = function(arrayIndex) {
+        var index = parseInt(arrayIndex);
+        return (index % 17) + 1;
+    };
+
     // 현재 플레이어의 턴을 그린다.(갱신한다)
     game.util.drawingPlayerTurn = function() {
         $('#showCurrentPlayer').html(game.common.currentPlayer);
@@ -73,6 +85,24 @@
                 $player2_walls[i].style.backgroundColor = game.color.WHITE;
             }
         }
+    };
+    
+    // 현재의 장애물 위치(1차원 인덱스)에서 다음의 장애물 위치(1차원 인덱스)를 리턴한다.
+    // arrayIndex : 현재의 장애물 위치(1차원 인덱스)
+    // nextValue : 현재로부터 몇칸 떨어졌는지
+    game.util.getNextWallIndex = function (arrayIndex, nextValue) {
+    	var x = game.util.getRealX(arrayIndex);
+    	var y = game.util.getRealY(arrayIndex);
+    	
+    	if (x % 2 == 0 && y < 17) {
+    		// 다음의 장애물 위치는 맵에서 오른쪽 위치
+    		return game.util.getArrayIndex(x, y + nextValue);
+    	} else if (y % 2 == 0 && x < 17) {
+    		// 다음의 장애물 위치는 맵에서 아래쪽 위치
+    		return game.util.getArrayIndex(x + nextValue, y);
+    	} else {
+    		return -1;
+    	}
     };
 
 })(jQuery, window, document);

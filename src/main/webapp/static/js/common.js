@@ -5,12 +5,15 @@
     // 현재 플레이어 (1 : 1p || 2 : 2p)
     game.common.currentPlayer = 1;
 
+    // 현재 플레이어의 액션 (상태값 game.actionStatus 참고)
+    game.common.currentAction = 0;
+
     // 플레이어 현재 위치 인덱스
     game.common.indexPlayer = [8,280];
 
     // 플레이어 장애물 개수
     game.common.cntWall = [10,10];
-
+    
     // TODO : 게임내의 색상 정의 (아래 HTML 색상표 참조)
     // https://www.w3schools.com/tags/ref_colornames.asp
     game.color = {
@@ -48,6 +51,16 @@
         NONE : "0",
         UNUSED : "1",
         USED : "2"
+    };
+
+    // 현재 플레이어의 액션 상태값 정의
+    // NONE : 아무것도 안함
+    // CLICKPLAYER : 플레이어 선택
+    // CLICKWALL : 벽 선택
+    game.actionStatus = {
+        NONE : "0",
+        CLICKPLAYER : "1",
+        CLICKWALL : "2"
     };
 
 })(jQuery, window, document);
