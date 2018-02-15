@@ -13,6 +13,11 @@
             	game.common.currentAction = game.actionStatus.CLICKPLAYER;
             	return false;
             }
+            
+            // action 상태가 NONE 이면 아무반응 안함
+            if (game.common.currentAction == game.actionStatus.NONE) {
+            	return false;
+            }
 
             // validate Position
             if (validatePosition(realX, realY) == false) {
@@ -40,6 +45,15 @@
                 // re-render
                 game.util.drawingMap();
                 game.util.drawingWalls();
+            }
+            
+            // Winner 판단
+            if (game.common.indexPlayer[0] > 271) {
+            	$('h2').html("1P Win");
+            	game.common.currentPlayer = -1;
+            } else if (game.common.indexPlayer[1] < 17) {
+            	$('h2').html("2P Win");
+            	game.common.currentPlayer = -1;
             }
         });
     }
@@ -109,12 +123,20 @@
         		return false;
         	}
         	
-        	// TODO : 내위치 에서 한번에 이동할 수 있는 거리인지 판단
-            var beforeX = $maps[game.common.indexPlayer[game.common.currentPlayer-1]].getAttribute("data-row");
-            var beforeY = $maps[game.common.indexPlayer[game.common.currentPlayer-1]].getAttribute("data-col");
+        	// 내위치 에서 한번에 이동할 수 있는 거리인지 판단
+            var beforeX = parseInt($maps[game.common.indexPlayer[game.common.currentPlayer-1]].getAttribute("data-row"));
+            var beforeY = parseInt($maps[game.common.indexPlayer[game.common.currentPlayer-1]].getAttribute("data-col"));
             var checkLength = Math.abs(realX - beforeX) + Math.abs(realY - beforeY);
             if (checkLength >= 4 || checkLength <= 0) {
                 return false;
+            }
+            
+            // 장애물에 막혀있는지 판단
+            var middleX = (beforeX + realX) / 2;
+            var middleY = (beforeY + realY) / 2;
+            var middleIndex = game.util.getArrayIndex(middleX, middleY);
+            if ($maps[middleIndex].getAttribute("data-status") != game.mapStatus.ABLE_WALL) {
+            	return false;
             }
             
         } else if (game.common.currentAction == game.actionStatus.CLICKWALL) {
@@ -140,6 +162,8 @@
             if ($maps[nextArrayIndex2].getAttribute("data-status") != game.mapStatus.ABLE_WALL) {
         		return false;
         	}
+            
+            // TODO : 길이 완전히 막히는지 판단
         }
 
         return true;
