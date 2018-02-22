@@ -63,4 +63,9 @@
         CLICKWALL : "2"
     };
 
+    // TODO
+    game.DfsMap = game.DfsMap || {};
+    game.VisitMap = game.VisitMap || {};
+    game.DfsAble = false;
+
 })(jQuery, window, document);

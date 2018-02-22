@@ -190,6 +190,12 @@
         var nextArrayIndex1 = game.util.getNextWallIndex(arrayIndex, 1);
         var nextArrayIndex2 = game.util.getNextWallIndex(arrayIndex, 2);
 
+        // TODO : 클릭했을 때, 1p,2p가 둘다 끝까지 도달할 수 있는 길이있어야 한다.
+        /*if () {
+            console.log("장애물을 놓을 수 없는 위치");
+            return;
+        }*/
+
         // 맵 상태값 변경
         $maps[arrayIndex].setAttribute("data-status", game.mapStatus.WALL);
         $maps[nextArrayIndex1].setAttribute("data-status", game.mapStatus.WALL);
@@ -203,6 +209,138 @@
         game.common.cntWall[game.common.currentPlayer - 1]--;
     }
 
+    // dfs 길찾기
+    function isInstallable() {
+        var player1_X = 0;
+        var player1_Y = 8;
+
+        var player2_X = 16;
+        var player2_Y = 8;
+
+        // 1p 이동 가능여부 확인
+        dfs(player1_X, player1_Y, 1);
+        if (!game.DfsAble) {
+            console.log("1p 이동 불가능");
+            game.DfsAble = false;
+            return false;
+        }
+        game.DfsAble = false;
+
+        // 맵 초기화
+        game.DfsMap = makeDFSArray();
+        game.VisitMap = makeVisitArray();
+
+        // 2p 이동 가능여부 확인
+        dfs(player2_X, player2_Y, 2);
+        if (!game.DfsAble) {
+            console.log("2p 이동 불가능");
+            game.DfsAble = false;
+            return false;
+        }
+        game.DfsAble = false;
+        console.log("둘다 이동가능");
+        return true;
+    }
+
+    // TODO
+    function dfs(x, y, currentPlayer) {
+        console.log("x : " + x + ", y : " + y);
+        // dfs가 종료되면
+        if (game.DfsAble) {
+            console.log("dfs 종료");
+            return;
+        }
+
+        if ((currentPlayer == 1 && x == 16) ||
+            (currentPlayer == 2 && x == 0)) {
+            game.DfsAble = true;
+            console.log("isAble true");
+            return;
+        }
+
+        // 배열의 범위를 벗어나면
+        if (x < 0 || y < 0 || x > 16 || y > 16) {
+            console.log("배열 범위 벗어남");
+            return;
+        }
+        // 이동할 수 없는 곳이면 (벽으로 막혀있거나, 아예 이동불가능한 위치이거나)
+        if (game.DfsMap[x][y] == game.mapStatus.WALL || game.DfsMap[x][y] == game.mapStatus.NONE) {
+            console.log("이동할 수 없는 위치");
+            return;
+        }
+        // 방문한 곳이면
+        if (game.VisitMap[x][y] == 1) {
+            return;
+        }
+
+        // 방문
+        game.VisitMap[x][y] = "1";
+
+        // 상
+        // setTimeout(function () {
+        //     dfs(x - 1, y, currentPlayer);
+        // }, 1000);
+        dfs(x - 1, y, currentPlayer);
+        // 하
+        // setTimeout(function () {
+        //     dfs(x + 1, y, currentPlayer);
+        // }, 1000);
+        dfs(x + 1, y, currentPlayer);
+        // 좌
+        // setTimeout(function () {
+        //     dfs(x, y - 1, currentPlayer);
+        // }, 1000);
+        dfs(x, y - 1, currentPlayer);
+        // 우
+        // setTimeout(function () {
+        //     dfs(x, y + 1, currentPlayer);
+        // }, 1000);
+        dfs(x, y + 1, currentPlayer);
+    }
+
+    // 기존맵으로 dfs용 이차원 배열을 생성한다.
+    function makeDFSArray() {
+        // 기존 맵
+        var $maps = $('.map');
+
+        // 숫자 맵(dfs용)
+        var map = new Array();
+
+        // 2차원 배열 만들기
+        for (var i = 0; i < 17; i++) {
+            map[i] = new Array();
+        }
+
+        // 현재맵 상태와 동일한 값으로 설정
+        for (var i = 0; i < 17; i++) {
+            for (var j = 0; j < 17; j++) {
+                map[i][j] = $maps[game.util.getArrayIndex(i+1, j+1)].getAttribute("data-status");
+            }
+        }
+        //console.log(map);
+
+        return map;
+    }
+
+    function makeVisitArray() {
+        // 숫자 맵(dfs용)
+        var map = new Array();
+
+        // 2차원 배열 만들기
+        for (var i = 0; i < 17; i++) {
+            map[i] = new Array();
+        }
+
+        // 방문전 상태를 만듬
+        for (var i = 0; i < 17; i++) {
+            for (var j = 0; j < 17; j++) {
+                map[i][j] = "0";
+            }
+        }
+
+        return map;
+    }
+
     // Main function
     $(document).ready(function () {
         // click event binding
@@ -210,6 +348,12 @@
 
         // mouseover event binding
         mouseoverMap();
+
+        game.DfsMap = makeDFSArray();
+        game.VisitMap = makeVisitArray();
+        console.log(game.DfsMap);
+        console.log(game.VisitMap);
+        console.log("dfs 결과 : ", isInstallable());
 
     });
 })(jQuery, window, document);
