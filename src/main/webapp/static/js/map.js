@@ -32,7 +32,16 @@
                     // 이동
                     move(realX, realY);
             	} else if (game.common.currentAction == game.actionStatus.CLICKWALL) {
-            		// 설치
+
+                    // TODO : 클릭했을 때, 1p,2p가 둘다 끝까지 도달할 수 있는 길이있어야 한다.
+                    if (!isInstallable(realX, realY)) {
+                        console.log("장애물을 놓을 수 없는 위치");
+                        alert("장애물을 놓을 수 없는 위치");
+                        return;
+                    }
+
+
+                    // 설치
             		install(realX, realY);
             	}
             	
@@ -190,12 +199,6 @@
         var nextArrayIndex1 = game.util.getNextWallIndex(arrayIndex, 1);
         var nextArrayIndex2 = game.util.getNextWallIndex(arrayIndex, 2);
 
-        // TODO : 클릭했을 때, 1p,2p가 둘다 끝까지 도달할 수 있는 길이있어야 한다.
-        /*if () {
-            console.log("장애물을 놓을 수 없는 위치");
-            return;
-        }*/
-
         // 맵 상태값 변경
         $maps[arrayIndex].setAttribute("data-status", game.mapStatus.WALL);
         $maps[nextArrayIndex1].setAttribute("data-status", game.mapStatus.WALL);
@@ -210,12 +213,16 @@
     }
 
     // dfs 길찾기
-    function isInstallable() {
-        var player1_X = 0;
-        var player1_Y = 8;
+    function isInstallable(realX, realY) {
+        var player1_X = game.util.getRealX(game.common.indexPlayer[0]) - 1;
+        var player1_Y = game.util.getRealY(game.common.indexPlayer[0]) - 1;
 
-        var player2_X = 16;
-        var player2_Y = 8;
+        var player2_X = game.util.getRealX(game.common.indexPlayer[1]) - 1;
+        var player2_Y = game.util.getRealY(game.common.indexPlayer[1]) - 1;
+
+        // 맵 초기화
+        game.DfsMap = makeDFSArray(realX, realY);
+        game.VisitMap = makeVisitArray();
 
         // 1p 이동 가능여부 확인
         dfs(player1_X, player1_Y, 1);
@@ -227,7 +234,6 @@
         game.DfsAble = false;
 
         // 맵 초기화
-        game.DfsMap = makeDFSArray();
         game.VisitMap = makeVisitArray();
 
         // 2p 이동 가능여부 확인
@@ -244,28 +250,24 @@
 
     // TODO
     function dfs(x, y, currentPlayer) {
-        console.log("x : " + x + ", y : " + y);
         // dfs가 종료되면
         if (game.DfsAble) {
-            console.log("dfs 종료");
             return;
         }
 
+        // 플레이어가 끝위치에 도달
         if ((currentPlayer == 1 && x == 16) ||
             (currentPlayer == 2 && x == 0)) {
             game.DfsAble = true;
-            console.log("isAble true");
             return;
         }
 
         // 배열의 범위를 벗어나면
         if (x < 0 || y < 0 || x > 16 || y > 16) {
-            console.log("배열 범위 벗어남");
             return;
         }
         // 이동할 수 없는 곳이면 (벽으로 막혀있거나, 아예 이동불가능한 위치이거나)
         if (game.DfsMap[x][y] == game.mapStatus.WALL || game.DfsMap[x][y] == game.mapStatus.NONE) {
-            console.log("이동할 수 없는 위치");
             return;
         }
         // 방문한 곳이면
@@ -277,29 +279,17 @@
         game.VisitMap[x][y] = "1";
 
         // 상
-        // setTimeout(function () {
-        //     dfs(x - 1, y, currentPlayer);
-        // }, 1000);
         dfs(x - 1, y, currentPlayer);
         // 하
-        // setTimeout(function () {
-        //     dfs(x + 1, y, currentPlayer);
-        // }, 1000);
         dfs(x + 1, y, currentPlayer);
         // 좌
-        // setTimeout(function () {
-        //     dfs(x, y - 1, currentPlayer);
-        // }, 1000);
         dfs(x, y - 1, currentPlayer);
         // 우
-        // setTimeout(function () {
-        //     dfs(x, y + 1, currentPlayer);
-        // }, 1000);
         dfs(x, y + 1, currentPlayer);
     }
 
     // 기존맵으로 dfs용 이차원 배열을 생성한다.
-    function makeDFSArray() {
+    function makeDFSArray(realX, realY) {
         // 기존 맵
         var $maps = $('.map');
 
@@ -318,6 +308,13 @@
             }
         }
         //console.log(map);
+
+        var arrayIndex = game.util.getArrayIndex(realX, realY);
+        var nextIndex1 = game.util.getNextWallIndex(arrayIndex, 1);
+        var nextIndex2 = game.util.getNextWallIndex(arrayIndex, 2);
+        map[game.util.getRealX(arrayIndex)-1][game.util.getRealY(arrayIndex)-1] = game.mapStatus.WALL;
+        map[game.util.getRealX(nextIndex1)-1][game.util.getRealY(nextIndex1)-1] = game.mapStatus.WALL;
+        map[game.util.getRealX(nextIndex2)-1][game.util.getRealY(nextIndex2)-1] = game.mapStatus.WALL;
 
         return map;
     }
@@ -348,12 +345,6 @@
 
         // mouseover event binding
         mouseoverMap();
-
-        game.DfsMap = makeDFSArray();
-        game.VisitMap = makeVisitArray();
-        console.log(game.DfsMap);
-        console.log(game.VisitMap);
-        console.log("dfs 결과 : ", isInstallable());
 
     });
 })(jQuery, window, document);
