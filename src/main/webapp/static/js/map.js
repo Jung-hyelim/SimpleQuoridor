@@ -33,9 +33,9 @@
                     move(realX, realY);
             	} else if (game.common.currentAction == game.actionStatus.CLICKWALL) {
 
-                    // TODO : 클릭했을 때, 1p,2p가 둘다 끝까지 도달할 수 있는 길이있어야 한다.
+                    // 클릭했을 때, 1p,2p가 둘다 끝까지 도달할 수 있는 길이있어야 한다.
                     if (!isInstallable(realX, realY)) {
-                        console.log("장애물을 놓을 수 없는 위치");
+                        //console.log("장애물을 놓을 수 없는 위치");
                         alert("장애물을 놓을 수 없는 위치");
                         return;
                     }
@@ -136,16 +136,68 @@
             var beforeX = parseInt($maps[game.common.indexPlayer[game.common.currentPlayer-1]].getAttribute("data-row"));
             var beforeY = parseInt($maps[game.common.indexPlayer[game.common.currentPlayer-1]].getAttribute("data-col"));
             var checkLength = Math.abs(realX - beforeX) + Math.abs(realY - beforeY);
-            if (checkLength >= 4 || checkLength <= 0) {
-                return false;
-            }
-            
-            // 장애물에 막혀있는지 판단
             var middleX = (beforeX + realX) / 2;
             var middleY = (beforeY + realY) / 2;
             var middleIndex = game.util.getArrayIndex(middleX, middleY);
-            if ($maps[middleIndex].getAttribute("data-status") != game.mapStatus.ABLE_WALL) {
-            	return false;
+            console.log("checkLength:"+checkLength+","+Math.abs(realX - beforeX)+","+Math.abs(realY - beforeY));
+            if (checkLength > 4 || checkLength <= 0) {
+            	// 한번에 이동할 수 있는 거리가 아님
+                return false;
+            } else if (checkLength == 4) {
+            	// 점프할 수 있는지 판단
+            	
+            	console.log("middle status:"+$maps[middleIndex].getAttribute("data-status"));
+            	if (Math.abs(realX - beforeX) == 4) {
+            		// 일직선 가로 점프
+            		
+            		// 점프 가운데에 플레이어가 있는지 판단
+            		if ($maps[middleIndex].getAttribute("data-status") != game.mapStatus.PLAYER1
+            		 && $maps[middleIndex].getAttribute("data-status") != game.mapStatus.PLAYER2) {
+            			return false;
+            		}
+            		
+            		// 점프 중간에 벽이 있는지 판단
+            		if ($maps[game.util.getArrayIndex(middleX-1, middleY)].getAttribute("data-status") == game.mapStatus.WALL
+            		 || $maps[game.util.getArrayIndex(middleX+1, middleY)].getAttribute("data-status") == game.mapStatus.WALL) {
+            			return false;
+            		}
+            	} else if (Math.abs(realY - beforeY) == 4) {
+            		// 일직선 세로 점프
+
+            		// 점프 가운데에 플레이어가 있는지 판단
+            		if ($maps[middleIndex].getAttribute("data-status") != game.mapStatus.PLAYER1
+            		 && $maps[middleIndex].getAttribute("data-status") != game.mapStatus.PLAYER2) {
+            			return false;
+            		}
+            		
+            		// 점프 중간에 벽이 있는지 판단
+            		if ($maps[game.util.getArrayIndex(middleX, middleY-1)].getAttribute("data-status") == game.mapStatus.WALL
+            		 || $maps[game.util.getArrayIndex(middleX, middleY+1)].getAttribute("data-status") == game.mapStatus.WALL) {
+            			return false;
+            		}
+            	} else {
+            		// 대각선 점프
+
+            		// 점프 가운데에 플레이어가 있는지 판단
+            		if ($maps[game.util.getArrayIndex(realX, beforeY)].getAttribute("data-status") != game.mapStatus.PLAYER1
+             	 	 && $maps[game.util.getArrayIndex(realX, beforeY)].getAttribute("data-status") != game.mapStatus.PLAYER2
+              		 && $maps[game.util.getArrayIndex(beforeX, realY)].getAttribute("data-status") != game.mapStatus.PLAYER1
+              	 	 && $maps[game.util.getArrayIndex(beforeX, realY)].getAttribute("data-status") != game.mapStatus.PLAYER2) {
+            			return false;
+            		}
+
+            		// TODO : 상대 플레이어 끝이 벽으로 막혀서 대각선으로 점프뛰는지 판단
+            		
+            		// TODO : 점프 중간에 벽이 있는지 판단
+            		
+            	}
+            } else {
+            	// 한번에 이동할 수 있는 거리임
+
+                // 장애물에 막혀있는지 판단
+                if ($maps[middleIndex].getAttribute("data-status") != game.mapStatus.ABLE_WALL) {
+                	return false;
+                }
             }
             
         } else if (game.common.currentAction == game.actionStatus.CLICKWALL) {
