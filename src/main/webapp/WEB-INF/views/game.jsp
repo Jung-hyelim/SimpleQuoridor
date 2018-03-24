@@ -37,4 +37,5 @@
 <script src="<c:url value="/static/js/game.js"/>"></script>
 <script src="<c:url value="/static/js/map.js"/>"></script>
 <script src="<c:url value="/static/js/wall.js"/>"></script>
+<script src="<c:url value="/static/js/validate.js"/>"></script>
 </html>
